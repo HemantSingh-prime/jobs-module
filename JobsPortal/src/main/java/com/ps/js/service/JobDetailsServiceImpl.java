@@ -8,12 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ps.js.entity.JobDetails;
 
 import com.ps.js.entity.Skill;
+import com.ps.js.exception.ErrorMessages;
 import com.ps.js.exception.JobDetailsNotCreatedException;
 import com.ps.js.mapper.JobDetailsMapper;
 import com.ps.js.payload.JobDetailsPayload;
+import com.ps.js.payload.JobDetailsResponsePayload;
 import com.ps.js.repository.JobDetailsRepository;
 /**
  * 
@@ -36,6 +39,7 @@ public class JobDetailsServiceImpl implements IJobDetailsService {
 	@Autowired
 	private JobDetailsMapper jobDetailsMapper;
 	
+	private static ObjectMapper mapper=new ObjectMapper();
 	/**
 	 * To create a new job details and added to 
 	 * @param jobDetails
@@ -44,21 +48,23 @@ public class JobDetailsServiceImpl implements IJobDetailsService {
 	 */
 	@Override
 	@Transactional
-	public JobDetailsPayload createJob(JobDetails jobDetails)throws JobDetailsNotCreatedException {
-		JobDetailsPayload jobDetailsPayload=new JobDetailsPayload();
+	public JobDetailsResponsePayload createJob(JobDetails jobDetails)throws JobDetailsNotCreatedException {
+		JobDetailsResponsePayload jobDetailsResponsePayload=new JobDetailsResponsePayload();
 		
 		
 		jobDetails=jobDetailsRepository.save(jobDetails);
 		//jobDetails.setJobId(0);
 		if(!(jobDetails.getJobId()>0))
-			throw new JobDetailsNotCreatedException("Job Details not added ");
+			throw new JobDetailsNotCreatedException(ErrorMessages.JOB_DETAILS_NOT_ADDED_EXCEPTION.toString());
 		
 		//Convert jobDetails to jobDetailsPayload using jobDetailsMapper
-            jobDetailsPayload=jobDetailsMapper.jobDetailToJobDetailsPayloadMapper(jobDetails, jobDetailsPayload);				
-		return jobDetailsPayload;
+            jobDetailsResponsePayload=jobDetailsMapper.jobDetailToJobDetailsResponsePayloadMapper(jobDetails, jobDetailsResponsePayload);				
+		      
+				
+            return jobDetailsResponsePayload;
 	}
      /**
-      * To find all the Jobs
+      * To find all the Jobs 
       * @param
       * @return {@link List<JobDetails>}
       */
@@ -67,13 +73,21 @@ public class JobDetailsServiceImpl implements IJobDetailsService {
 		   List<JobDetails> listJobDetails= jobDetailsRepository.findAll();
 		return listJobDetails;
 	}
-
+	/**
+     * To find all the Jobs based on requested job-status 
+     * @param
+     * @return {@link List<JobDetails>}
+     */
 	@Override
 	public List<JobDetails> findAllJobByJobStatus(String jobStatus) {
 		
 		return jobDetailsRepository.findByJobStatus(jobStatus);
 	}
-
+     /**
+      * To Update jobDetails by using job-code or job-id
+      * @param
+      * return {@link optional<JobDetails>}
+      */
 	@Override
 	public Optional<JobDetails> updateJobDetails(JobDetails jobDetails) {
 		// TODO Auto-generated method stub

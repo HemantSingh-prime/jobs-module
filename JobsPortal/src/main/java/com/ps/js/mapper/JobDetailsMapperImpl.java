@@ -11,42 +11,49 @@ import com.ps.js.entity.JobLocation;
 import com.ps.js.entity.RolesAndResponsebility;
 import com.ps.js.entity.Skill;
 import com.ps.js.payload.JobDetailsPayload;
+import com.ps.js.payload.JobDetailsResponsePayload;
+import com.ps.js.payload.ResponsePayload;
 
 @Component
 public class JobDetailsMapperImpl implements JobDetailsMapper {
 
 	@Override
-	public JobDetailsPayload jobDetailToJobDetailsPayloadMapper(JobDetails jobDetails, JobDetailsPayload jobDetailsPayload) {
-		Set<Integer> locations = new HashSet<Integer>();
-		Set<Integer> primarySkills = new HashSet<Integer>();
-		Set<Integer> secondrySkills = new HashSet<Integer>();
-		Set<Integer> rolesAndResponsebilities = new HashSet<Integer>();
-		
-		
+	public JobDetailsResponsePayload jobDetailToJobDetailsResponsePayloadMapper(JobDetails jobDetails, JobDetailsResponsePayload jobDetailsResponsePayload) {
+		Set<ResponsePayload> locations = new HashSet<ResponsePayload>();
+		Set<ResponsePayload> primarySkills = new HashSet<ResponsePayload>();
+		Set<ResponsePayload> secondrySkills = new HashSet<ResponsePayload>();
+		Set<ResponsePayload> rolesAndResponsebilities = new HashSet<ResponsePayload>();
+		ResponsePayload response=null;
+		BeanUtils.copyProperties(jobDetails, jobDetailsResponsePayload);
 		for(JobLocation location:jobDetails.getJobLocation()) {
-			
-			locations.add(location.getLocationId());
+			 response=new ResponsePayload();
+			 response.setId(location.getLocationId());
+			 
+			locations.add(response);
 		}
 		for(Skill skill:jobDetails.getPrimarySkill()) {
-			
-			primarySkills.add(skill.getSkillId());
+			response=new ResponsePayload();
+			response.setId(skill.getSkillId());
+			primarySkills.add(response);
 		}
 		for(Skill skill:jobDetails.getSecondrySkill()) {
-			
-			secondrySkills.add(skill.getSkillId());
+			response=new ResponsePayload();
+			response.setId(skill.getSkillId());
+			secondrySkills.add(response);
 		}
 		for(RolesAndResponsebility rolesAndResponsebility:jobDetails.getRolesAndResponsebilities()) {
-			
-			rolesAndResponsebilities.add(rolesAndResponsebility.getId());
+			response=new ResponsePayload();
+			response.setId(rolesAndResponsebility.getId());
+			rolesAndResponsebilities.add(response);
 		}
-		jobDetailsPayload.setJobLocation(locations);
-		jobDetailsPayload.setPrimarySkill(primarySkills);
-		jobDetailsPayload.setSecondrySkill(secondrySkills);
-		jobDetailsPayload.setRolesAndResponsebilities(rolesAndResponsebilities);
-		BeanUtils.copyProperties(jobDetails, jobDetailsPayload);
+		jobDetailsResponsePayload.setJobLocation(locations);
+		jobDetailsResponsePayload.setPrimarySkill(primarySkills);
+		jobDetailsResponsePayload.setSecondrySkill(secondrySkills);
+		jobDetailsResponsePayload.setRolesAndResponsebilities(rolesAndResponsebilities);
 		
 		
-		return jobDetailsPayload;
+		
+		return jobDetailsResponsePayload;
 	}
 
 	@Override

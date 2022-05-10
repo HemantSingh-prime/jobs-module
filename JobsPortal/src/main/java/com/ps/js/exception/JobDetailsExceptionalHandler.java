@@ -15,6 +15,12 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.ps.js.response.ErrorResponse;
+
+/**
+ * 
+ * @author Hemant
+ *
+ */
 @SuppressWarnings({"unchecked","rawtypes"})
 @ControllerAdvice
 public class JobDetailsExceptionalHandler extends ResponseEntityExceptionHandler {
@@ -25,7 +31,7 @@ public class JobDetailsExceptionalHandler extends ResponseEntityExceptionHandler
 		details.add(HttpStatus.INTERNAL_SERVER_ERROR.toString());
 		ErrorResponse response = new ErrorResponse();
 		if (exception.getMessage() == null)
-			response.setMessage("Internal Sever error Job details not added");
+			response.setMessage(ErrorMessages.INTERNAL_SERVER_ERROR_JOB_DETAILS_NOT_CREATED_EXCEPTION.toString());
 		else
 			response.setMessage(exception.getMessage());
 		response.setDetails(details);
@@ -39,23 +45,13 @@ public class JobDetailsExceptionalHandler extends ResponseEntityExceptionHandler
 		details.add(HttpStatus.NOT_FOUND.toString());
 		ErrorResponse response = new ErrorResponse();
 		if (exception.getMessage() == null)
-			response.setMessage("Job Details Not found exception");
+			response.setMessage(ErrorMessages.JOB_DETAILS_NOT_FOUND_EXCEPTION.toString());
 		else
 			response.setMessage(exception.getMessage());
 		response.setDetails(details);
 		return new ResponseEntity<Object>(response,HttpStatus.NOT_FOUND);
 	}
-//	@ExceptionHandler(MethodArgumentNotValidException.class)
-//	public ResponseEntity<Object> exception(MethodArgumentNotValidException exception){
-//		List<String> details = new ArrayList<String>();
-//		details.add(HttpStatus.BAD_REQUEST.toString());
-//		ErrorResponse response=new ErrorResponse();
-//		if (exception.getMessage() == null)
-//			response.setMessage("Validation failed exception");
-//		details.add(exception.getLocalizedMessage());
-//		response.setDetails(details);;
-//		return new ResponseEntity<Object>(response,HttpStatus.BAD_REQUEST);
-//	}
+
 	
 	@Override
 	  protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
@@ -74,7 +70,7 @@ public class JobDetailsExceptionalHandler extends ResponseEntityExceptionHandler
 		details.add(HttpStatus.NOT_FOUND.toString());
 		ErrorResponse response = new ErrorResponse();
 		if (exception.getMessage() == null)
-			response.setMessage("Location Not found exception");
+			response.setMessage(ErrorMessages.LOCATION_NOT__FOUND_EXCEPTION.toString());
 		else
 			response.setMessage(exception.getMessage());
 		response.setDetails(details);
@@ -87,10 +83,23 @@ public class JobDetailsExceptionalHandler extends ResponseEntityExceptionHandler
 		details.add(HttpStatus.NOT_FOUND.toString());
 		ErrorResponse response = new ErrorResponse();
 		if (exception.getMessage() == null)
-			response.setMessage("Skill Not found exception");
+			response.setMessage(ErrorMessages.SKILL_NOT_FOUND_EXCEPTION.toString());
 		else
 			response.setMessage(exception.getMessage());
 		response.setDetails(details);
 		return new ResponseEntity<Object>(response,HttpStatus.NOT_FOUND);
 	}
+	@ExceptionHandler(RolesAndResponsebilityNotFoundException.class)
+	public ResponseEntity<Object> exception(RolesAndResponsebilityNotFoundException exception){
+		List<String> details = new ArrayList<String>();
+		details.add(HttpStatus.NOT_FOUND.toString());
+		ErrorResponse response = new ErrorResponse();
+		if (exception.getMessage() == null)
+			response.setMessage(ErrorMessages.ROLES_AND_RESPONSEBILITY_NOT_FOUND.toString());
+		else
+			response.setMessage(exception.getMessage());
+		response.setDetails(details);
+		return new ResponseEntity<Object>(response,HttpStatus.NOT_FOUND);
+	}
+	
 }

@@ -35,9 +35,12 @@ public class JobLocationServices implements IJobLocationServices {
 		    System.out.println(jobLocation1);
 		return jobLocation1;
 	}
-
+    /**
+     * To find job location by location-id
+     * 
+     */
 	@Override
-	public Optional<JobLocation> fetchJobLocationById(int locationId) throws LocationsNotFoundException {
+	public Optional<JobLocation> fetchJobLocationById(int locationId)throws LocationsNotFoundException {
 		Optional<JobLocation> optionalJobLocation=jobLocationRepository.findById(locationId);
 		if(optionalJobLocation.isEmpty())
 			throw new LocationsNotFoundException();

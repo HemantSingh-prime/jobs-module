@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ps.js.entity.RolesAndResponsebility;
+import com.ps.js.exception.ErrorMessages;
+import com.ps.js.exception.RolesAndResponsebilityNotFoundException;
 import com.ps.js.repository.RolesAndResponsebilityRepository;
 
 @Service
@@ -21,17 +23,23 @@ public class RolesAndResponsebilityServiceImpl implements IRolesAndResponsebilit
 		
 		return rolesAndResponsebilityRepository.findByRolesResponsebility(rolesResponsebility);
 	}
-
+     /**
+      * To fetch all roles and responsebility
+      */
 	@Override
 	public List<RolesAndResponsebility> fetchAllRolesAndResponsebility() {
-		
+		      
 		return rolesAndResponsebilityRepository.findAll();
 	}
-
+    /**
+     * To find roles and responsebility by id
+     */
 	@Override
 	public Optional<RolesAndResponsebility> fetchRolesAndResponsebilityById(int id) {
-		
-		return rolesAndResponsebilityRepository.findById(id);
+		   Optional<RolesAndResponsebility> rolesAndResponsebility=rolesAndResponsebilityRepository.findById(id); 
+		       if(rolesAndResponsebility.isEmpty())
+		    	   throw new RolesAndResponsebilityNotFoundException(ErrorMessages.ROLES_AND_RESPONSEBILITY_NOT_FOUND.toString());
+		return rolesAndResponsebility;
 	}
 
 }
