@@ -9,11 +9,13 @@ import java.util.Set;
 import javax.management.relation.RoleNotFoundException;
 import javax.validation.Valid;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,9 +27,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ps.js.entity.Department;
 import com.ps.js.entity.JobDetails;
 import com.ps.js.entity.JobLocation;
-import com.ps.js.entity.RolesAndResponsebility;
 import com.ps.js.entity.Skill;
 import com.ps.js.exception.ErrorMessages;
+import com.ps.js.exception.JobDetailsNotCreatedException;
 import com.ps.js.exception.JobDetailsNotFoundException;
 import com.ps.js.exception.LocationsNotFoundException;
 import com.ps.js.exception.RolesAndResponsebilityNotFoundException;
@@ -37,13 +39,12 @@ import com.ps.js.payload.JobDetailsPayload;
 import com.ps.js.payload.JobDetailsResponsePayload;
 import com.ps.js.payload.JobLocationPayload;
 import com.ps.js.payload.ResponsePayload;
-import com.ps.js.payload.RolesAndResponsebilityPayload;
 import com.ps.js.payload.SkillPayload;
 
 import com.ps.js.service.IDepartmentService;
 import com.ps.js.service.IJobDetailsService;
 import com.ps.js.service.IJobLocationServices;
-import com.ps.js.service.IRolesAndResponsebilityService;
+
 import com.ps.js.service.ISkillServices;
 
 @RestController
@@ -73,8 +74,8 @@ public class JobsController {
 	/**
 	 * Injecting rolesAndResponsebilityService
 	 */
-	@Autowired
-	private IRolesAndResponsebilityService rolesAndResponsebilityService;
+	// @Autowired
+	// private IRolesAndResponsebilityService rolesAndResponsebilityService;
 	/**
 	 * Injecting JobDetailsMapper
 	 */
@@ -110,13 +111,14 @@ public class JobsController {
 		Set<JobLocation> locations = new HashSet<JobLocation>();
 		Set<Skill> primarySkills = new HashSet<Skill>();
 		Set<Skill> secondrySkills = new HashSet<Skill>();
-		Set<RolesAndResponsebility> rolesAndResponsebilities = new HashSet<RolesAndResponsebility>();
+		// Set<RolesAndResponsebility> rolesAndResponsebilities = new
+		// HashSet<RolesAndResponsebility>();
 		JobDetails jobDetails = new JobDetails();
 		JobDetailsResponsePayload jobDetailsResponsePayload = null;
 		// Convert job details to job details payload using jobDetailsMapper service
 		jobDetails = jobDetailsMapper.jobDetailsPayloadToJobDetailsMapper(jobDetailsPayload, jobDetails);
 
-		System.out.println("jobDetails :: " + jobDetails);
+		
 
 		// Fetching the location and adding to collection
 		for (JobLocation location : jobDetails.getJobLocation()) {
@@ -134,10 +136,10 @@ public class JobsController {
 		}
 
 		// Fetching the roles and responsebility and added to collection
-		for (RolesAndResponsebility responsebility : jobDetails.getRolesAndResponsebilities()) {
-			rolesAndResponsebilities
-					.add(rolesAndResponsebilityService.fetchRolesAndResponsebilityById(responsebility.getId()).get());
-		}
+//		for (RolesAndResponsebility responsebility : jobDetails.getRolesAndResponsebilities()) {
+//			rolesAndResponsebilities
+//					.add(rolesAndResponsebilityService.fetchRolesAndResponsebilityById(responsebility.getId()).get());
+//		}
 		if (locations.isEmpty())
 			throw new LocationsNotFoundException();
 		else if (primarySkills.isEmpty())
@@ -158,12 +160,8 @@ public class JobsController {
 			for (ResponsePayload payload : jobDetailsResponsePayload.getSecondrySkill()) {
 				payload.setUrl("jobs/find-skill-by-id/" + payload.getId());
 			}
-			for (ResponsePayload payload : jobDetailsResponsePayload.getRolesAndResponsebilities()) {
-				payload.setUrl("jobs/find-roles-and-responsebility-by-id/" + payload.getId());
-			}
-		}
 
-		// System.out.println("jobDetailsResponsePayload "+jobDetailsResponsePayload);
+		}
 
 		return new ResponseEntity<JobDetailsResponsePayload>(jobDetailsResponsePayload, HttpStatus.OK);
 	}
@@ -176,10 +174,13 @@ public class JobsController {
 	 */
 	@GetMapping("/find-skill-by-id/{skill-id}")
 	public ResponseEntity<Skill> findSKillById(@PathVariable("skill-id") int skillId) {
+		Skill skill = null;
 		// Fetch skill by id
-		Skill skill = skillServices.fetchSkillById(skillId).get();
-		   if(skill==null)
-			     throw new SkillNotFoundException();
+		Optional<Skill> optionalSkill = skillServices.fetchSkillById(skillId);
+
+		if (optionalSkill.isEmpty())
+			throw new SkillNotFoundException();
+		skill = optionalSkill.get();
 		return new ResponseEntity<Skill>(skill, HttpStatus.OK);
 	}
 
@@ -191,28 +192,13 @@ public class JobsController {
 	 */
 	@GetMapping("/find-location-by-id/{location-id}")
 	public ResponseEntity<JobLocation> findLocationById(@PathVariable("location-id") int locationId) {
+		JobLocation location = null;
 		// Fetch location by location-id
-		JobLocation location = jobLocationServices.fetchJobLocationById(locationId).get();
-                    if(location==null)
-                    	throw new LocationsNotFoundException(ErrorMessages.LOCATION_NOT__FOUND_EXCEPTION.toString());
+		Optional<JobLocation> optionalLocation = jobLocationServices.fetchJobLocationById(locationId);
+		if (optionalLocation.isEmpty())
+			throw new LocationsNotFoundException(ErrorMessages.LOCATION_NOT__FOUND_EXCEPTION.toString());
+		location = optionalLocation.get();
 		return new ResponseEntity<JobLocation>(location, HttpStatus.OK);
-	}
-
-	/**
-	 * To find RolesAndResponsebility by using id
-	 * 
-	 * @param id
-	 * @return {@link ResponseEntity<RolesAndResponsebility>}
-	 */
-	@GetMapping("/find-roles-and-responsebility-by-id/{id}")
-	public ResponseEntity<RolesAndResponsebility> findRolesAndResponsebilityById(@PathVariable("id") int id) {
-		// Fetch roles and responsebility by id
-		RolesAndResponsebility rolesAndResponsebility = rolesAndResponsebilityService
-				.fetchRolesAndResponsebilityById(id).get();
-               
-		if(rolesAndResponsebility==null)
-			  throw new RolesAndResponsebilityNotFoundException(ErrorMessages.ROLES_AND_RESPONSEBILITY_NOT_FOUND.toString());
-		return new ResponseEntity<RolesAndResponsebility>(rolesAndResponsebility, HttpStatus.OK);
 	}
 
 	/**
@@ -231,7 +217,7 @@ public class JobsController {
 			skillPayload.setSkillName(skill.getSkillName());
 			listSkillPayload.add(skillPayload);
 		}
-		System.out.println("listSkillPayload :: " + listSkillPayload);
+		
 		return new ResponseEntity<List<SkillPayload>>(listSkillPayload, HttpStatus.OK);
 	}
 
@@ -248,34 +234,14 @@ public class JobsController {
 		for (JobLocation location : listJobLocations) {
 			jobLocationPayload = new JobLocationPayload();
 			jobLocationPayload.setLocationId(location.getLocationId());
-			jobLocationPayload.setLocationName(location.getLocationName());
+			jobLocationPayload.setLocationName(location.getCountry());
 			listJobLocationPayload.add(jobLocationPayload);
 		}
 
 		return new ResponseEntity<List<JobLocationPayload>>(listJobLocationPayload, HttpStatus.OK);
 	}
 
-	/**
-	 * To find all roles and responsebility for open a new job
-	 * 
-	 * @return {@link ResponseEntity}
-	 */
-	@GetMapping("/find-all-roles-and-responsebility")
-	public ResponseEntity<List<RolesAndResponsebilityPayload>> findAllRolesAndResponsebility() {
-		RolesAndResponsebilityPayload rolesAndResponsebilityPayload = null;
-		List<RolesAndResponsebilityPayload> listRolesAndResponsebilityPayload = new ArrayList<RolesAndResponsebilityPayload>();
-		List<RolesAndResponsebility> listRolesAndResponsebility = rolesAndResponsebilityService
-				.fetchAllRolesAndResponsebility();
-		for (RolesAndResponsebility rolesAndResponsebility : listRolesAndResponsebility) {
-			rolesAndResponsebilityPayload = new RolesAndResponsebilityPayload();
-			rolesAndResponsebilityPayload.setId(rolesAndResponsebility.getId());
-			rolesAndResponsebilityPayload.setRolesResponsebility(rolesAndResponsebility.getRolesResponsebility());
-			listRolesAndResponsebilityPayload.add(rolesAndResponsebilityPayload);
-		}
-
-		return new ResponseEntity<List<RolesAndResponsebilityPayload>>(listRolesAndResponsebilityPayload,
-				HttpStatus.OK);
-	}
+	
 
 	/**
 	 * For delete jobDetails by using job-code and return confirmation for the
@@ -285,12 +251,68 @@ public class JobsController {
 	 * @return {@link ResponseEntity}
 	 */
 
-	@DeleteMapping("/delete-job-details/{job-code}")
-	public ResponseEntity<String> deleteJobDetails(@PathVariable("job-code") String jobCode) {
-		System.out.println(jobCode);
-		JobDetails jobDetails = jobDetailsService.fetchJobDetailsByJobCode(jobCode).get();
+	@DeleteMapping("/delete-job-details/{job-id}")
+	public ResponseEntity<String> deleteJobDetails(@PathVariable("job-id") int jobId) {
+		// Find Job details using jobDetailsService based job-id
+		Optional<JobDetails> optionalJobDetails = jobDetailsService.findJobByJobId(jobId);
+		if (optionalJobDetails.isEmpty())
+			throw new JobDetailsNotFoundException(ErrorMessages.JOB_DETAILS_NOT_FOUND_EXCEPTION.toString());
+		JobDetails jobDetails = optionalJobDetails.get();
+		// Deleting jobDetails using jobDetailsService
+		jobDetails = jobDetailsService.deleteJobDetails(jobDetails).get();
 
 		return new ResponseEntity<String>("Job details Delete :" + jobDetails.getJobId(), HttpStatus.OK);
+	}
+
+	/**
+	 * For updated jobDetails by using job-id and return updated jobDetails
+	 * response.
+	 * 
+	 * 
+	 * @param jobDetailsPayload
+	 * @return {@link ResponseEntity}
+	 */
+	@PatchMapping("/update-job-details")
+	public ResponseEntity<JobDetails> updateJobDetails(
+			@RequestBody JobDetailsPayload jobDetailsPayload) {
+		JobDetailsResponsePayload jobDetailsResponsePayload = new JobDetailsResponsePayload();
+		Optional<JobDetailsResponsePayload> optionalJobDetailsResponsePayload = null;
+		JobDetails jobDetails = new JobDetails();
+		Set<JobLocation> locations = new HashSet<JobLocation>();
+		Set<Skill> primarySkills = new HashSet<Skill>();
+		Set<Skill> secondrySkills = new HashSet<Skill>();
+		Optional<JobDetails> optionalJobDetails = null;
+		// Convert JobDetailsPayload to JobDetails
+		jobDetails = jobDetailsMapper.jobDetailsPayloadToJobDetailsMapper(jobDetailsPayload, jobDetails);
+		// Find jobDetails by job-id
+		optionalJobDetails = jobDetailsService.findJobByJobId(jobDetails.getJobId());
+		// Fetching the location and adding to collection
+		       if(jobDetails.getJobLocation()!=null)
+				for (JobLocation location : jobDetails.getJobLocation()) {
+					locations.add(jobLocationServices.fetchJobLocationById(location.getLocationId()).get());
+				}
+
+				// Fetching the primary skills and added to collection
+		       if(jobDetails.getPrimarySkill()!=null)
+				for (Skill skill : jobDetails.getPrimarySkill()) {
+					primarySkills.add(skillServices.fetchSkillById(skill.getSkillId()).get());
+				}
+
+				// Fetching the secondary skills and added to collection
+		       if(jobDetails.getSecondrySkill()!=null)
+				for (Skill skill : jobDetails.getSecondrySkill()) {
+					secondrySkills.add(skillServices.fetchSkillById(skill.getSkillId()).get());
+				}
+		if (optionalJobDetails.isEmpty())
+			throw new JobDetailsNotFoundException(ErrorMessages.JOB_DETAILS_NOT_FOUND_EXCEPTION.toString());
+		  jobDetails.setPrimarySkill(primarySkills);
+		  jobDetails.setSecondrySkill(secondrySkills);
+		  jobDetails.setJobLocation(locations);
+		// Updating jobDetails using jobDetailsService
+		jobDetails = jobDetailsService.updateJobDetails(jobDetails);
+		
+
+		return new ResponseEntity<JobDetails>(jobDetails, HttpStatus.OK);
 	}
 
 	/**
@@ -344,7 +366,8 @@ public class JobsController {
 	 */
 	@PostMapping("/add-skill")
 	public ResponseEntity<Skill> addSkill(@Valid @RequestBody Skill skill) {
-		skill = skillServices.addSkill(skill).get();
+	  Optional<Skill>	optionalSkill = skillServices.addSkill(skill);
+	      skill=optionalSkill.get();
 		return new ResponseEntity<Skill>(skill, HttpStatus.OK);
 	}
 

@@ -46,8 +46,9 @@ public class JobDetailsPayload  {
 	private Set<Integer> primarySkill;
 	@NotEmpty(message = "secondry skills set should not be null or empty")
 	private Set<Integer> secondrySkill;
-	@NotEmpty(message = "roles and responsebility set should not be null or empty")
-	private Set<Integer> rolesAndResponsebilities;
+	@NotNull(message = "roles and responsebility should not be null")
+	@NotEmpty(message = "roles and responsebility set should not be empty")
+	private String rolesAndResponsebility;
 	private Date jobPostingDate;
 	@NotNull(message = "job status should not be null ")
 	@NotBlank(message = "job status should not be empty")

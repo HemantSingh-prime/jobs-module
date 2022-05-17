@@ -24,7 +24,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ps.js.entity.JobDetails;
 import com.ps.js.entity.JobLocation;
-import com.ps.js.entity.RolesAndResponsebility;
+
 import com.ps.js.entity.Skill;
 import com.ps.js.exception.JobDetailsNotCreatedException;
 import com.ps.js.mapper.JobDetailsMapperImpl;

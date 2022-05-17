@@ -16,9 +16,9 @@ public interface IJobDetailsService {
 	
 	public List<JobDetails> findAllJobByJobStatus(final String jobStatus);
 	
-	public Optional<JobDetails> updateJobDetails(JobDetails jobDetails);
+	public JobDetails updateJobDetails(JobDetails jobDetails);
 	
-	public Optional<JobDetails> deleteJobDetails(final String jobCode);
+	public Optional<JobDetails> deleteJobDetails(JobDetails jobDetails);
 	
 	public List<JobDetails> fetchedJobDetailsByDesignation(final String designation);
 	
@@ -27,4 +27,6 @@ public interface IJobDetailsService {
 	public Optional<JobDetails> fetchJobDetailsByJobCode(final String jobCode);
 	
 	public List<JobDetails> fetchedJobDetailsByLocationAndDesignation(final String designation,final String location);
+	
+	public Optional<JobDetails> findJobByJobId(int jobId);
 }

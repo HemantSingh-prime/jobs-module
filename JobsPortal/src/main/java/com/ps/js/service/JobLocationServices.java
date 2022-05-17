@@ -17,11 +17,7 @@ public class JobLocationServices implements IJobLocationServices {
 	@Autowired
 	private JobLocationRepository jobLocationRepository;
 	
-	@Override
-	public Optional<JobLocation> fetchJobLocationByName(String locationName) {
-		Optional<JobLocation> jobLocationOptional=jobLocationRepository.findByLocationName(locationName);
-		return jobLocationOptional;
-	}
+	
 
 	@Override
 	public List<JobLocation> fetchAllLocation() {

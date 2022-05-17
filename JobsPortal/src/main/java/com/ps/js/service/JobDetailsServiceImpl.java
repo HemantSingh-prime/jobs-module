@@ -1,5 +1,7 @@
 package com.ps.js.service;
 
+import static org.hamcrest.CoreMatchers.nullValue;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +16,7 @@ import com.ps.js.entity.JobDetails;
 import com.ps.js.entity.Skill;
 import com.ps.js.exception.ErrorMessages;
 import com.ps.js.exception.JobDetailsNotCreatedException;
+import com.ps.js.exception.JobDetailsNotFoundException;
 import com.ps.js.mapper.JobDetailsMapper;
 import com.ps.js.payload.JobDetailsPayload;
 import com.ps.js.payload.JobDetailsResponsePayload;
@@ -48,20 +51,19 @@ public class JobDetailsServiceImpl implements IJobDetailsService {
 	 */
 	@Override
 	@Transactional
-	public JobDetailsResponsePayload createJob(JobDetails jobDetails)throws JobDetailsNotCreatedException {
-		JobDetailsResponsePayload jobDetailsResponsePayload=new JobDetailsResponsePayload();
-		
-		
-		jobDetails=jobDetailsRepository.save(jobDetails);
-		//jobDetails.setJobId(0);
-		if(!(jobDetails.getJobId()>0))
+	public JobDetailsResponsePayload createJob(JobDetails jobDetails) throws JobDetailsNotCreatedException {
+		JobDetailsResponsePayload jobDetailsResponsePayload = new JobDetailsResponsePayload();
+
+		jobDetails = jobDetailsRepository.save(jobDetails);
+		// jobDetails.setJobId(0);
+		if (!(jobDetails.getJobId() > 0))
 			throw new JobDetailsNotCreatedException(ErrorMessages.JOB_DETAILS_NOT_ADDED_EXCEPTION.toString());
-		
-		//Convert jobDetails to jobDetailsPayload using jobDetailsMapper
-            jobDetailsResponsePayload=jobDetailsMapper.jobDetailToJobDetailsResponsePayloadMapper(jobDetails, jobDetailsResponsePayload);				
-		      
-				
-            return jobDetailsResponsePayload;
+
+		// Convert jobDetails to jobDetailsPayload using jobDetailsMapper
+		jobDetailsResponsePayload = jobDetailsMapper.jobDetailToJobDetailsResponsePayloadMapper(jobDetails,
+				jobDetailsResponsePayload);
+
+		return jobDetailsResponsePayload;
 	}
      /**
       * To find all the Jobs 
@@ -89,15 +91,60 @@ public class JobDetailsServiceImpl implements IJobDetailsService {
       * return {@link optional<JobDetails>}
       */
 	@Override
-	public Optional<JobDetails> updateJobDetails(JobDetails jobDetails) {
-		// TODO Auto-generated method stub
-		return null;
+	public JobDetails updateJobDetails(JobDetails jobDetailsUpdated) {
+		  
+		JobDetails jobDetails=new JobDetails();
+		
+		JobDetailsResponsePayload responsePayload=new JobDetailsResponsePayload();
+		//Find job details by job-id
+		Optional<JobDetails>  optionalJobDetails=jobDetailsRepository.findById(jobDetailsUpdated.getJobId());
+		System.out.println(optionalJobDetails);
+		  if(optionalJobDetails.isEmpty())
+			  throw new JobDetailsNotFoundException();
+		  jobDetails=optionalJobDetails.get();
+		  System.out.println("job Details :: "+jobDetails);
+				  if(jobDetailsUpdated.getDepartmentId()<1)
+					  jobDetailsUpdated.setDepartmentId(jobDetails.getDepartmentId());
+				  if(jobDetailsUpdated.getDescription()==null || jobDetailsUpdated.getDescription().isBlank())
+					  jobDetailsUpdated.setDescription(jobDetails.getDescription());
+				  if(jobDetailsUpdated.getDesignation()==null || jobDetailsUpdated.getDesignation().isBlank())
+					  jobDetailsUpdated.setDesignation(jobDetails.getDesignation());
+				  if(jobDetailsUpdated.getJobStatus()==null || jobDetailsUpdated.getJobStatus().isBlank())
+					  jobDetailsUpdated.setJobStatus(jobDetails.getJobStatus());
+				  if(jobDetailsUpdated.getRolesAndResponsebility()==null ||jobDetailsUpdated.getRolesAndResponsebility().isEmpty())
+					  jobDetailsUpdated.setRolesAndResponsebility(jobDetails.getRolesAndResponsebility());
+				  if(jobDetailsUpdated.getJobPostingDate()==null)
+					  jobDetailsUpdated.setJobPostingDate(jobDetails.getJobPostingDate());
+				  if(jobDetailsUpdated.getJobLocation()==null)
+					  jobDetailsUpdated.setJobLocation(jobDetails.getJobLocation());
+				  if(jobDetailsUpdated.getPrimarySkill()==null)
+					  jobDetailsUpdated.setPrimarySkill(jobDetails.getPrimarySkill());
+				  if(jobDetailsUpdated.getSecondrySkill()==null)
+					  jobDetailsUpdated.setSecondrySkill(jobDetails.getSecondrySkill());
+				  if(jobDetailsUpdated.getJobCode()==null)
+					  jobDetailsUpdated.setJobCode(jobDetails.getJobCode());
+				  
+		jobDetailsUpdated=jobDetailsRepository.save(jobDetailsUpdated);
+		 
+		    
+		return jobDetailsUpdated;
 	}
-
+	/**
+     * To Delete jobDetails by using job-id 
+     * @param
+     * return {@link optional<JobDetails>}
+     */
 	@Override
-	public Optional<JobDetails> deleteJobDetails(String jobCode) {
-		// TODO Auto-generated method stub
-		return null;
+	public Optional<JobDetails> deleteJobDetails(JobDetails jobDetails) {
+		jobDetailsRepository.delete(jobDetails);
+		  Optional<JobDetails> optional=Optional.of(jobDetails);
+		return optional;
+	}
+	@Override
+	public Optional<JobDetails> findJobByJobId(int jobId){
+		Optional<JobDetails> optionalJobDetails=jobDetailsRepository.findById(jobId);
+		
+		return optionalJobDetails;
 	}
 
 	@Override
@@ -130,8 +177,8 @@ public class JobDetailsServiceImpl implements IJobDetailsService {
 
 	@Override
 	public Optional<JobDetails> fetchJobDetailsByJobCode(String jobCode) {
-		
-		return jobDetailsRepository.findByJobCode(jobCode);
+		      Optional<JobDetails> optionalJobDetails=jobDetailsRepository.findByJobCode(jobCode);
+		return optionalJobDetails;
 	}
 
 }

@@ -18,7 +18,10 @@ public class JobLocation {
 	@Column(name="location_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int locationId;
-	@Column(name="location_name")
-	private String locationName;
+	private String country;
+	private  String address;
+	private String continent;
+	private String region;
+	
 	
 }

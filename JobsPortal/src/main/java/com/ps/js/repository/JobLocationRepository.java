@@ -10,7 +10,7 @@ import com.ps.js.entity.JobLocation;
 @Repository
 public interface JobLocationRepository extends JpaRepository<JobLocation, Integer> {
 
-	Optional<JobLocation> findByLocationName(final String locationName);
+	//Optional<JobLocation> findByLocationName(final String locationName);
 	
 	
 }

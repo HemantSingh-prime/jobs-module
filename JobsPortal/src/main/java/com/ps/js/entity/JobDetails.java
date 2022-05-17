@@ -67,7 +67,7 @@ public class JobDetails {
 	/**
 	 * Creating departmentId
 	 */
-	@Column(name="department_id")
+	@Column(name="DEPARTMENT_ID")
 	private int departmentId;
 	/**
 	 * Creating description
@@ -91,15 +91,16 @@ public class JobDetails {
 		        joinColumns = { @JoinColumn(name = "job_id") },
 		        inverseJoinColumns = { @JoinColumn(name = "skill_id") })
 	private Set<Skill> secondrySkill;
-	@ManyToMany(fetch = FetchType.LAZY,
-		      cascade = {
-		          
-		          CascadeType.MERGE
-		      })
-		  @JoinTable(
-		        joinColumns = { @JoinColumn(name = "job_id") },
-		        inverseJoinColumns = { @JoinColumn(name = "id") })
-	private Set<RolesAndResponsebility> rolesAndResponsebilities;
+//	@ManyToMany(fetch = FetchType.LAZY,
+//		      cascade = {
+//		          
+//		          CascadeType.MERGE
+//		      })
+//		  @JoinTable(
+//		        joinColumns = { @JoinColumn(name = "job_id") },
+//		        inverseJoinColumns = { @JoinColumn(name = "id") })
+//	private Set<RolesAndResponsebility> rolesAndResponsebilities;
+	private String rolesAndResponsebility;
 	private Date jobPostingDate;
 	private String jobStatus;
 	@ManyToMany(fetch = FetchType.LAZY,

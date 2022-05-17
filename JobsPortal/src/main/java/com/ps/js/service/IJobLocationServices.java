@@ -7,7 +7,7 @@ import com.ps.js.entity.JobLocation;
 
 public interface IJobLocationServices {
 
-	public Optional<JobLocation> fetchJobLocationByName(final String locationName );
+	
 	
 	public List<JobLocation> fetchAllLocation();
 	
