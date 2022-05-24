@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ps.js.entity.Skill;
 import com.ps.js.exception.SkillNotFoundException;
 import com.ps.js.repository.SkillRepository;
-import com.ps.js.service.SkillServicesImpl;
+import com.ps.js.service.SkillServiceImpl;
 
 @SpringBootTest
 @RunWith(MockitoJUnitRunner.class)
@@ -28,7 +28,7 @@ import com.ps.js.service.SkillServicesImpl;
 public class SkillServiceTest {
 
 	@Mock
-	private SkillServicesImpl skillServicesImpl;
+	private SkillServiceImpl skillServicesImpl;
 	@MockBean
 	private SkillRepository repository;
 	private static ObjectMapper objectMapper=new ObjectMapper();

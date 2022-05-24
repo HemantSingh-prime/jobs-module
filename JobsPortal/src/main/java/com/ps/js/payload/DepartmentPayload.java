@@ -10,7 +10,7 @@ public class DepartmentPayload {
 
 	
 	private int departmentId;
-	@NotNull
-	@NotBlank
+	@NotNull(message = "Department name should not be null")
+	@NotBlank(message = "Department name should not be empty")
 	private String departmentName; 
 }

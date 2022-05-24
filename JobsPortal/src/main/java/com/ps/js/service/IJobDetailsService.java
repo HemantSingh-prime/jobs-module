@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import com.ps.js.entity.JobDetails;
 import com.ps.js.entity.Skill;
-import com.ps.js.payload.JobDetailsPayload;
+
 import com.ps.js.payload.JobDetailsResponsePayload;
 
 public interface IJobDetailsService {

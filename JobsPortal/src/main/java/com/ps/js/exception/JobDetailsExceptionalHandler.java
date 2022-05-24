@@ -102,4 +102,17 @@ public class JobDetailsExceptionalHandler extends ResponseEntityExceptionHandler
 		return new ResponseEntity<Object>(response,HttpStatus.NOT_FOUND);
 	}
 	
+	@ExceptionHandler(DepartmentNotFoundException.class)
+	public ResponseEntity<Object> exception(DepartmentNotFoundException exception){
+		List<String> details = new ArrayList<String>();
+		details.add(HttpStatus.NOT_FOUND.toString());
+		ErrorResponse response = new ErrorResponse();
+		if (exception.getMessage() == null)
+			response.setMessage(ErrorMessages.DEPARTMENT_NOT_FOUND_EXCEPTION.toString());
+		else
+			response.setMessage(exception.getMessage());
+		response.setDetails(details);
+		return new ResponseEntity<Object>(response,HttpStatus.NOT_FOUND);
+	}
+	
 }

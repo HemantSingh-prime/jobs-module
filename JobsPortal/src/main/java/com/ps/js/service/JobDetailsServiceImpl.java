@@ -1,18 +1,20 @@
 package com.ps.js.service;
 
-import static org.hamcrest.CoreMatchers.nullValue;
+
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ps.js.entity.JobDetails;
 
+import com.ps.js.entity.JobDetails;
+import com.ps.js.entity.JobLocation;
 import com.ps.js.entity.Skill;
 import com.ps.js.exception.ErrorMessages;
 import com.ps.js.exception.JobDetailsNotCreatedException;
@@ -42,7 +44,7 @@ public class JobDetailsServiceImpl implements IJobDetailsService {
 	@Autowired
 	private JobDetailsMapper jobDetailsMapper;
 	
-	private static ObjectMapper mapper=new ObjectMapper();
+	//private static ObjectMapper mapper=new ObjectMapper();
 	/**
 	 * To create a new job details and added to 
 	 * @param jobDetails
@@ -94,15 +96,39 @@ public class JobDetailsServiceImpl implements IJobDetailsService {
 	public JobDetails updateJobDetails(JobDetails jobDetailsUpdated) {
 		  
 		JobDetails jobDetails=new JobDetails();
-		
-		JobDetailsResponsePayload responsePayload=new JobDetailsResponsePayload();
+		Set<JobLocation> listLocations=new HashSet<JobLocation>();
+		Set<Skill> listPrimarySkills=new HashSet<Skill>();
+		Set<Skill> listSecondrySkills=new HashSet<Skill>();
+		JobLocation jobLocation=null;
+		//JobDetailsResponsePayload responsePayload=new JobDetailsResponsePayload();
 		//Find job details by job-id
 		Optional<JobDetails>  optionalJobDetails=jobDetailsRepository.findById(jobDetailsUpdated.getJobId());
-		System.out.println(optionalJobDetails);
+		// Fetching the location and adding to collection
+	       if(jobDetails.getJobLocation()!=null)
+			for (JobLocation location : jobDetails.getJobLocation()) {
+				jobLocation=new JobLocation();
+				listLocations.add(jobLocationService.fetchJobLocationById(location.getLocationId()).get());
+			}
+
+			// Fetching the primary skills and added to collection
+	       if(jobDetails.getPrimarySkill()!=null)
+			for (Skill skill : jobDetails.getPrimarySkill()) {
+				listPrimarySkills.add(skillService.fetchSkillById(skill.getSkillId()).get());
+			}
+
+			// Fetching the secondary skills and added to collection
+	       if(jobDetails.getSecondrySkill()!=null)
+			for (Skill skill : jobDetails.getSecondrySkill()) {
+				listSecondrySkills.add(skillService.fetchSkillById(skill.getSkillId()).get());
+			}
+	       
+	       jobDetailsUpdated.setPrimarySkill(listPrimarySkills);
+			  jobDetailsUpdated.setSecondrySkill(listSecondrySkills);
+			  jobDetailsUpdated.setJobLocation(listLocations);
 		  if(optionalJobDetails.isEmpty())
 			  throw new JobDetailsNotFoundException();
 		  jobDetails=optionalJobDetails.get();
-		  System.out.println("job Details :: "+jobDetails);
+		
 				  if(jobDetailsUpdated.getDepartmentId()<1)
 					  jobDetailsUpdated.setDepartmentId(jobDetails.getDepartmentId());
 				  if(jobDetailsUpdated.getDescription()==null || jobDetailsUpdated.getDescription().isBlank())
@@ -115,23 +141,24 @@ public class JobDetailsServiceImpl implements IJobDetailsService {
 					  jobDetailsUpdated.setRolesAndResponsebility(jobDetails.getRolesAndResponsebility());
 				  if(jobDetailsUpdated.getJobPostingDate()==null)
 					  jobDetailsUpdated.setJobPostingDate(jobDetails.getJobPostingDate());
-				  if(jobDetailsUpdated.getJobLocation()==null)
+				  if(jobDetailsUpdated.getJobLocation()==null || jobDetailsUpdated.getJobLocation().size()==0)
 					  jobDetailsUpdated.setJobLocation(jobDetails.getJobLocation());
-				  if(jobDetailsUpdated.getPrimarySkill()==null)
+				  if(jobDetailsUpdated.getPrimarySkill()==null ||jobDetailsUpdated.getPrimarySkill().size()==0)
 					  jobDetailsUpdated.setPrimarySkill(jobDetails.getPrimarySkill());
-				  if(jobDetailsUpdated.getSecondrySkill()==null)
+				  if(jobDetailsUpdated.getSecondrySkill()==null || jobDetailsUpdated.getSecondrySkill().size()==0)
 					  jobDetailsUpdated.setSecondrySkill(jobDetails.getSecondrySkill());
 				  if(jobDetailsUpdated.getJobCode()==null)
 					  jobDetailsUpdated.setJobCode(jobDetails.getJobCode());
 				  
+				  
 		jobDetailsUpdated=jobDetailsRepository.save(jobDetailsUpdated);
-		 
+		  
 		    
 		return jobDetailsUpdated;
 	}
 	/**
      * To Delete jobDetails by using job-id 
-     * @param
+     * @param jobId
      * return {@link optional<JobDetails>}
      */
 	@Override
@@ -140,6 +167,12 @@ public class JobDetailsServiceImpl implements IJobDetailsService {
 		  Optional<JobDetails> optional=Optional.of(jobDetails);
 		return optional;
 	}
+	
+	/**
+     * To find jobDetails by using job-id 
+     * @param jobId
+     * return {@link optional<JobDetails>}
+     */
 	@Override
 	public Optional<JobDetails> findJobByJobId(int jobId){
 		Optional<JobDetails> optionalJobDetails=jobDetailsRepository.findById(jobId);

@@ -1,15 +1,13 @@
 package com.ps.js;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mockitoSession;
+
 
 import java.io.File;
-import java.sql.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -23,10 +21,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ps.js.entity.JobDetails;
-import com.ps.js.entity.JobLocation;
 
-import com.ps.js.entity.Skill;
-import com.ps.js.exception.JobDetailsNotCreatedException;
 import com.ps.js.mapper.JobDetailsMapperImpl;
 import com.ps.js.payload.JobDetailsPayload;
 import com.ps.js.payload.JobDetailsResponsePayload;
@@ -71,4 +66,35 @@ public class JosPortalServiceTest {
 		response=jobDetailsServiceImpl.createJob(jobDetails);
 		assertThat(response.getJobId()).isEqualTo(jobDetailsResponse.getJobId());
 	}
+	
+	@Test
+	void findAllJob_successful() throws Exception{
+		List<JobDetails> listJobDetails=new ArrayList<JobDetails>();
+		listJobDetails.add(jobDetailsResponse);
+		Mockito.when(jobDetailsServiceImpl.findAllJob()).thenReturn(listJobDetails);
+		List<JobDetails> list=jobDetailsServiceImpl.findAllJob();
+		assertThat(list.size()).isGreaterThanOrEqualTo(1);
+				
+	}
+	
+	@Test
+	void updateJobDetails_successful() throws Exception {
+		//JobDetailsPayload jobDetailsPayload = jobDetailsRequestPayload;
+		//jobDetailsPayload.setJobId(1);
+		JobDetails jobDetailsUpdated = new JobDetails();
+		jobDetails.setJobId(1);
+		JobDetails jobDetailsResponse = objectMapper
+				.readValue(new File("src/test/java/com/ps/js/payload/job-details-response.json"), JobDetails.class);
+		Optional<JobDetails> optionalJobDetails = Optional.of(jobDetailsResponse);
+		Mockito.when(jobDetailsRepository.findById(1)).thenReturn(optionalJobDetails);
+		//Mockito.when(jobLocationServices.fetchJobLocationById(1)).thenReturn(optionalLocation);
+		//Mockito.when(skillServicesImpl.fetchSkillById(1)).thenReturn(optionalPrimarySkill);
+		//Mockito.when(skillServicesImpl.fetchSkillById(2)).thenReturn(optionalSecondrySkill);
+		
+		Mockito.when(jobDetailsServiceImpl.updateJobDetails(jobDetails)).thenReturn(jobDetails);
+		jobDetailsUpdated=jobDetailsServiceImpl.updateJobDetails(jobDetails);
+		assertThat(jobDetails.getJobId()).isEqualTo(jobDetailsUpdated.getJobId());
+	}
+	
+	
 }

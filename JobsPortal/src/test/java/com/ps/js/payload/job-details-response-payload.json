@@ -22,16 +22,7 @@
             "url": "jobs/find-skill-by-id/2"
         }
     ],
-    "rolesAndResponsebilities": [
-        {
-            "id": 2,
-            "url": "jobs/find-roles-and-responsebility-by-id/2"
-        },
-        {
-            "id": 1,
-            "url": "jobs/find-roles-and-responsebility-by-id/1"
-        }
-    ],
+    "rolesAndResponsebility": "Do Ur Job",
     "jobPostingDate": "2022-04-19",
     "jobStatus": "ACTIVE",
     "jobLocation": [

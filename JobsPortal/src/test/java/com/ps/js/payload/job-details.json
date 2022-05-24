@@ -18,17 +18,14 @@
 		"skillId": 2,
 		"skillName": null
 	}],
-	"rolesAndResponsebilities": [{
-		"id": 2,
-		"rolesResponsebility": null
-	}, {
-		"id": 1,
-		"rolesResponsebility": null
-	}],
+	"rolesAndResponsebility": "Do Ur Job",
 	"jobPostingDate": "2022-04-19",
 	"jobStatus": "ACTIVE",
 	"jobLocation": [{
 		"locationId": 1,
-		"locationName": null
+		"country":null,
+        "address":null,
+        "continent":null,
+        "region":null
 	}]
 }

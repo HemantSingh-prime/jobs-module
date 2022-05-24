@@ -1,4 +1,7 @@
 {
 "locationId":1,
-"locationName":"NOIDA"
+"country":"INDIA",
+"address":"MUMBAI CENTRAL MUMBAI",
+"continent":"ASIA",
+"region":"SOUTH ASIA"
 }
