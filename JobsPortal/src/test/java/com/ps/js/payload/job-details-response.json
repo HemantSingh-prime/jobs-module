@@ -1,0 +1,31 @@
+{
+	"jobId": 1,
+	"title": "For Java Developer",
+	"designation": "JAVA DEVELOPER",
+	"jobCode": "AB08",
+	"noOfPositions": 5,
+	"minSalary": 8.0,
+	"maxSalary": 12.0,
+	"minExperience": 1,
+	"maxExperience": 5,
+	"departmentId": 1,
+	"description": "Looking for good developer",
+	"primarySkill": [{
+		"skillId": 1,
+		"skillName": null
+	}],
+	"secondrySkill": [{
+		"skillId": 2,
+		"skillName": null
+	}],
+	"rolesAndResponsebility": "Do Ur Job",
+	"jobPostingDate": "2022-04-19",
+	"jobStatus": "ACTIVE",
+	"jobLocation": [{
+		"locationId": 1,
+		"country":null,
+        "address":null,
+        "continent":null,
+        "region":null
+	}]
+}
